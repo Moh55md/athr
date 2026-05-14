@@ -170,14 +170,54 @@
             localStorage.setItem('my_visitors', JSON.stringify(visitorData));
         }
 
-        function addPoemToLib() {
-            const p = document.getElementById('adm-poet').value;
-            const t = document.getElementById('adm-title').value;
-            const c = document.getElementById('adm-content').value;
-            if(p && t && c) {
-                libraryData.unshift({ p, t, c });
-                renderLib();
-                alert("تمت الإضافة للموسوعة بنجاح");
+      async function addPoemToLib() {
+    const p = document.getElementById('adm-poet').value;
+    const t = document.getElementById('adm-title').value;
+    const c = document.getElementById('adm-content').value;
+    
+    if(!p || !t || !c) return alert("يا محمد، فضلاً أكمل بيانات القصيدة أولاً");
+
+    // --- بياناتك الشخصية من GitHub ---
+    const GITHUB_TOKEN = 'github_pat_11BRTKA5Q04i6e1P2uH5W2_8zqqyhg9L89roN3pqgSIk11I07N9ojDXfyxLwvhn8v35DZEWKDDoFjz'; // التوكن من صورتك
+    const REPO_OWNER = 'yateem'; // اسم حسابك يظهر في الصورة
+    const REPO_NAME = 'athr-alklmat'; // اسم المستودع (تأكد من كتابته بدقة)
+    const FILE_PATH = 'index.html'; 
+
+    try {
+        // 1. جلب الملف الحالي من جيث هب
+        const res = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+            headers: { 'Authorization': `token ${GITHUB_TOKEN}` }
+        });
+        const fileData = await res.json();
+        const content = decodeURIComponent(escape(atob(fileData.content)));
+
+        // 2. إضافة السطر الجديد داخل المصفوفة برمجياً
+        const newPoemLine = `{ p: "${p}", t: "${t}", c: "${c}" },\n            `;
+        const updatedContent = content.replace('let libraryData = [', `let libraryData = [\n            ${newPoemLine}`);
+
+        // 3. إرسال التحديث لـ GitHub ليحفظه للأبد
+        const updateRes = await fetch(`https://api.github.com/repos/${REPO_OWNER}/${REPO_NAME}/contents/${FILE_PATH}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${GITHUB_TOKEN}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                message: `إضافة قصيدة: ${t}`,
+                content: btoa(unescape(encodeURIComponent(updatedContent))),
+                sha: fileData.sha
+            })
+        });
+
+        if(updateRes.ok) {
+            alert("كفو! تم حفظ القصيدة في الكود الأساسي على جيث هب. ستظهر خلال دقيقة.");
+            location.reload(); // تحديث الصفحة لرؤية النتيجة
+        }
+    } catch (error) {
+        console.error(error);
+        alert("حدثت مشكلة في الاتصال بـ GitHub، تأكد من اسم المستودع (Repo Name)");
+    }
+}
             }
         }
 
