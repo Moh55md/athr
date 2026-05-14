@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>أثـر | ديوان العرب</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Aref+Ruqaa:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --gold: #c5a059; --deep-red: #7d1a1a; --parchment: #fdfaf5; --ink: #2c2c2c; }
+        body {
+            background-color: #1a1a1a;
+            background-image: url('https://www.transparenttextures.com/patterns/arabesque.png');
+            background-attachment: fixed; margin: 0; font-family: 'Amiri', serif; color: var(--ink);
+            display: flex; justify-content: center; padding: 40px 20px;
+        }
+        .main-wrapper {
+            max-width: 950px; width: 100%; background: var(--parchment);
+            box-shadow: 0 0 60px rgba(0,0,0,0.6); border: 2px solid var(--gold);
+            position: relative; min-height: 90vh; display: flex; flex-direction: column;
+        }
+        header { text-align: center; padding: 50px 20px; border-bottom: 2px double var(--gold); }
+        header h1 { font-family: 'Aref Ruqaa', serif; font-size: 5.5rem; margin: 0; color: var(--deep-red); line-height: 1; }
+        .motto { color: var(--gold); font-size: 1.5rem; margin-top: 15px; font-weight: bold; font-style: italic; }
+        nav { display: flex; justify-content: center; background: var(--ink); padding: 15px; position: sticky; top: 0; z-index: 100; }
+        nav a { color: var(--gold); text-decoration: none; margin: 0 25px; font-size: 1.3rem; font-weight: bold; cursor: pointer; transition: 0.3s; }
+        nav a:hover { color: #fff; transform: scale(1.1); }
+        .content-area { padding: 40px; flex-grow: 1; }
+        .page { display: none; animation: fadeIn 0.8s ease; }
+        .active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .admin-panel { background: #fff; border: 1px solid var(--gold); padding: 30px; margin-bottom: 40px; box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .admin-panel h3 { font-family: 'Aref Ruqaa', serif; color: var(--deep-red); font-size: 2rem; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        input, textarea, select { width: 100%; padding: 12px 15px; border: 1px solid #ddd; border-radius: 4px; font-family: 'Amiri'; font-size: 1.2rem; box-sizing: border-box; background: #fafafa; margin-bottom: 15px; }
+        .btn-gold { background: var(--ink); color: var(--gold); border: 1px solid var(--gold); padding: 12px 35px; font-size: 1.2rem; font-family: 'Amiri'; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        .btn-gold:hover { background: var(--deep-red); color: #fff; border-color: var(--deep-red); }
+        .card { background: #fff; padding: 40px; margin-bottom: 30px; border-right: 6px solid var(--deep-red); text-align: center; box-shadow: 0 3px 10px rgba(0,0,0,0.05); }
+        .card p { font-size: 2.2rem; line-height: 1.8; margin-bottom: 20px; color: var(--ink); }
+        .card .meta { color: var(--gold); font-size: 1.4rem; font-weight: bold; }
+        .poets-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 25px; }
+        .poet-circle { text-align: center; cursor: pointer; transition: 0.3s; }
+        .poet-circle img { width: 130px; height: 130px; border-radius: 50%; border: 3px solid var(--gold); object-fit: cover; margin-bottom: 10px; }
+        footer { text-align: center; padding: 40px; border-top: 1px solid var(--gold); background: rgba(0,0,0,0.02); }
+        .delete-btn { color: #c0392b; cursor: pointer; font-weight: bold; text-decoration: underline; margin-top: 10px; display: inline-block; }
+    </style>
+</head>
+<body>
+<div class="main-wrapper">
+    <header>
+        <h1>أثـر</h1>
+        <div class="motto">"الجسدُ يفنى، والبصمةُ تبقى، والكلمةُ أثرٌ لا يمحوهُ الزمان"</div>
+    </header>
+    <nav>
+        <a onclick="navigate('home')">الرئيسية</a>
+        <a onclick="navigate('poets')">رواق الشعراء</a>
+        <a onclick="navigate('encyclopedia')">الموسوعة الأدبية</a>
+        <a onclick="navigate('visitors')">أثر الزوار</a>
+    </nav>
+    <div class="content-area">
+        <div id="home" class="page active">
+            <div id="daily-quote-container"></div>
+        </div>
+        <div id="poets" class="page">
+            <div id="poetAdmin" style="display:none;" class="admin-panel">
+                <h3>إضافة قامة أدبية</h3>
+                <input type="text" id="pName" placeholder="اسم الشاعر">
+                <input type="text" id="pImg" placeholder="رابط صورة الشاعر">
+                <button class="btn-gold" onclick="addPoet()">تخليد الشاعر</button>
+            </div>
+            <div id="poetsList" class="poets-grid"></div>
+        </div>
+        <div id="encyclopedia" class="page">
+            <input type="text" id="searchBar" onkeyup="render()" placeholder="ابحث في خبايا المعاني..." style="margin-bottom:30px; border-radius: 50px;">
+            <button id="loginBtn" class="btn-gold" onclick="login()" style="display:block; margin: 0 auto 30px;">دخول لوحة التحكم</button>
+            <div id="adminPanel" style="display:none;" class="admin-panel">
+                <h3>نشر أثر جديد</h3>
+                <select id="poetSelect"></select>
+                <textarea id="poemText" rows="5" placeholder="اكتب أبيات القصيدة هنا..."></textarea>
+                <button class="btn-gold" onclick="addPoem()">نشر في الموسوعة</button>
+                <button class="btn-gold" style="background:#555; border:none; margin-right:10px;" onclick="logout()">خروج</button>
+            </div>
+            <div id="poemList"></div>
+        </div>
+        <div id="visitors" class="page">
+            <div class="admin-panel">
+                <h3>خطّ أثرك في رمالنا</h3>
+                <input type="text" id="vName" placeholder="اسمك">
+                <textarea id="vMsg" rows="3" placeholder="كلمة للأجيال..."></textarea>
+                <button class="btn-gold" onclick="addVisitor()">إرسال</button>
+            </div>
+            <div id="visitorList"></div>
+        </div>
+    </div>
+    <footer>
+        <div style="color: var(--deep-red); font-weight: bold; margin-bottom: 10px;">جميع الحقوق محفوظة لدى محمد يتيم &copy; 2026</div>
+    </footer>
+</div>
+<script>
+    let isAdmin = false;
+    // قائمة الأقوال التي تتغير تلقائياً
+    const randomQuotes = [
+        {t: "خُلقتَ لتركِ أثرٍ، لا لتكونَ مجردَ عابرٍ في ممراتِ التاريخ.", a: "حكمة الديوان"},
+        {t: "وإذا أتتك مذمتي من ناقصٍ فهي الشهادةُ لي بأني كاملُ", a: "المتنبي"},
+        {t: "بقدرِ الكدِّ تُكتسبُ المعالي ومن طلبَ العُلا سهرَ الليالي", a: "الشافعي"},
+        {t: "وما استعصى على قومٍ منالٌ إذا الإقدامُ كان لهم ركاباً", a: "أحمد شوقي"},
+        {t: "وليسَ يصحُّ في الأفهامِ شيءٌ إذا احتاجَ النهارُ إلى دليلِ", a: "المتنبي"}
+    ];
+
+    let db = JSON.parse(localStorage.getItem('athr_ultimate_db')) || { official: [], visitors: [], poets: [{name: "المتنبي", img: "https://via.placeholder.com/150", id: 1}] };
+
+    function navigate(id) {
+        document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+        document.getElementById(id).classList.add('active');
+        if(id === 'home') showRandomQuote();
+        render();
+    }
+
+    function showRandomQuote() {
+        const quote = randomQuotes[Math.floor(Math.random() * randomQuotes.length)];
+        document.getElementById('daily-quote-container').innerHTML = `
+            <div class="card" style="border-right: none; border-top: 6px solid var(--gold);">
+                <p>"${quote.t}"</p>
+                <div class="meta">— ${quote.a}</div>
+            </div>`;
+    }
+
+    function login() { if(prompt("رمز الإدارة:") === "1234") { isAdmin = true; render(); } }
+    function logout() { isAdmin = false; render(); }
+    function addPoet() { const name = document.getElementById('pName').value; const img = document.getElementById('pImg').value || "https://via.placeholder.com/150"; if(name) { db.poets.push({name, img, id: Date.now()}); save(); } }
+    function addPoem() { const poet = document.getElementById('poetSelect').value; const text = document.getElementById('poemText').value; if(poet && text) { db.official.unshift({poet, text, id: Date.now()}); save(); } }
+    function addVisitor() { const n = document.getElementById('vName').value; const m = document.getElementById('vMsg').value; if(n && m) { db.visitors.unshift({n, m, id: Date.now()}); save(); } }
+    function deleteItem(type, id) { if(isAdmin && confirm("حذف نهائي؟")) { db[type] = db[type].filter(i => i.id !== id); save(); } }
+    function save() { localStorage.setItem('athr_ultimate_db', JSON.stringify(db)); render(); }
+    function filterByPoet(name) { document.getElementById('searchBar').value = name; navigate('encyclopedia'); }
+
+    function render() {
+        document.getElementById('adminPanel').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('poetAdmin').style.display = isAdmin ? 'block' : 'none';
+        document.getElementById('loginBtn').style.display = isAdmin ? 'none' : 'block';
+        document.getElementById('poetSelect').innerHTML = db.poets.map(p => `<option>${p.name}</option>`).join('');
+        document.getElementById('poetsList').innerHTML = db.poets.map(p => `<div class="poet-circle" onclick="filterByPoet('${p.name}')"><img src="${p.img}"><div style="font-weight:bold">${p.name}</div>${isAdmin ? `<div class="delete-btn" onclick="deleteItem('poets', ${p.id})">حذف</div>` : ''}</div>`).join('');
+        const q = document.getElementById('searchBar').value.toLowerCase();
+        document.getElementById('poemList').innerHTML = db.official.filter(i => i.text.toLowerCase().includes(q) || i.poet.toLowerCase().includes(q)).map(i => `<div class="card">${isAdmin ? `<div class="delete-btn" style="float:left" onclick="deleteItem('official', ${i.id})">حذف</div>` : ''}<p>${i.text.replace(/\n/g, '<br>')}</p><div class="meta">— ${i.poet}</div></div>`).join('');
+        document.getElementById('visitorList').innerHTML = db.visitors.map(i => `<div class="card" style="border-right-color:#ccc; padding:25px;">${isAdmin ? `<div class="delete-btn" style="float:left" onclick="deleteItem('visitors', ${i.id})">حذف</div>` : ''}<p style="font-size:1.5rem">${i.m}</p><div style="color:var(--gold)">بصمة الزائر: ${i.n}</div></div>`).join('');
+    }
+
+    showRandomQuote();
+    render();
+</script>
+</body>
+</html>
